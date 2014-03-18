@@ -1,5 +1,9 @@
+from django.shortcuts import render
+
 def index(request):
-    None
+    # TODO Check user
+    context = {}
+    return render(request, 'index.html', context)
     
 def account_edition(request):
     None

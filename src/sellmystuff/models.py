@@ -75,7 +75,7 @@ class Account(CoreModel):
     creation_date = models.DateTimeField()
     last_update = models.DateTimeField()
     expiry_date = models.DateTimeField(null=True, blank=True)
-    currency = models.ForeignKey(Attributes, limit_choices_to={'type':'currency'}, related_name='account_type_rel')
+    currency = models.ForeignKey(Attributes, limit_choices_to={'type':'currency'}, related_name='account_currency_rel')
     active = models.BooleanField()
 
     def get_fields(self):
@@ -112,7 +112,7 @@ class Media(CoreModel):
 
 class Advertisement(CoreModel):
     title = models.CharField(max_length=256)
-    sub_title = models.CharField(may_length=128, null=True, blank=True)
+    sub_title = models.CharField(max_length=128, null=True, blank=True)
     publish_date = models.DateTimeField()
     last_update = models.DateTimeField()
     type = models.ForeignKey(Attributes, limit_choices_to={'type':'ad_type'}, related_name='ad_type_rel')

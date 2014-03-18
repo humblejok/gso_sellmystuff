@@ -16,6 +16,17 @@
 	</head>
 	<body>
 		<div class="container" style="padding: 0 15px;">
-
+			{% if request.user.is_authenticated %}
+				<div class="row">
+		    		<a href="/account_view.html" class="btn btn-primary btn-lg" role="button">View</a>
+		    		<a href="/account_edition.html" class="btn btn-primary btn-lg" role="button">Edit</a>
+		    		<a href="/account_management.html" class="btn btn-primary btn-lg" role="button">Manage</a>
+		    		<a href="/accounts/logout" class="btn btn-primary btn-lg" role="button">Log out</a>
+		    	</div>
+			{% else %}
+				<div class="row">
+		    		<a href="/accounts/login" class="btn btn-primary btn-lg" role="button">Login</a>
+		    	</div>
+			{% endif %}
 		</div>
 	</body>
