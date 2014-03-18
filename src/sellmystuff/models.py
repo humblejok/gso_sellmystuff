@@ -1,9 +1,69 @@
 from django.db import models
 import logging
 from django.contrib.auth.models import User
+import os
+from seq_common.utils import classes
+from openpyxl.reader.excel import load_workbook
+
+MAIN_PATH = 'c:\\DEV\\Sources\\gso_sellmystuff\\resources'
 
 LOGGER = logging.getLogger(__name__)
 
+def setup():
+    populate_attributes_from_xlsx('sellmystuff.models.Attributes', os.path.join(MAIN_PATH,'Repository Setup.xlsx'))
+    # populate_attributes_from_xlsx('universe.models.Dictionary', os.path.join(MAIN_PATH,'Repository Setup.xlsx'))
+
+def populate_attributes_from_xlsx(model_name, xlsx_file):
+    model = classes.my_class_import(model_name)
+    workbook = load_workbook(xlsx_file)
+    sheet = workbook.get_sheet_by_name(name=model.__name__)
+    row_index = 0
+    # Reading header
+    header = []
+    for column_index in range(0, sheet.get_highest_column()):
+        value = sheet.cell(row = row_index, column=column_index).value
+        if value!=None:
+            header.append(value if value!='' else header[-1])
+        else:
+            break
+    LOGGER.info('Using header:' + str(header))
+    row_index += 1
+    while row_index<sheet.get_highest_row():
+        if model.objects.filter(identifier=sheet.cell(row = row_index, column=0).value).exists():
+            instance = model.objects.get(identifier=sheet.cell(row = row_index, column=0).value)
+        else:
+            instance = model()
+        for i in range(0,len(header)):
+            value = sheet.cell(row = row_index, column=i).value
+            setattr(instance, header[i], value)
+        instance.save()
+        row_index += 1
+
+def populate_model_from_xlsx(model_name, xlsx_file):
+    model = classes.my_class_import(model_name)
+    workbook = load_workbook(xlsx_file)
+    sheet = workbook.get_sheet_by_name(name=model.__name__)
+    row_index = 0
+    # Reading header
+    header = []
+    for column_index in range(0, sheet.get_highest_column()):
+        value = sheet.cell(row = row_index, column=column_index).value
+        if value!=None:
+            header.append(value if value!='' else header[-1])
+        else:
+            break
+    LOGGER.info('Using header:' + str(header))
+    row_index += 1
+    while row_index<sheet.get_highest_row():
+        instance = model()
+        for i in range(0,len(header)):
+            value = sheet.cell(row = row_index, column=i).value
+            field_info = Attributes()
+            field_info.short_name = header[i]
+            field_info.name = header[i]
+            instance.set_attribute('excel', field_info, value)
+        instance.save()
+        row_index += 1
 class CoreModel(models.Model):
 
     def get_editable_fields(self):
@@ -76,6 +136,7 @@ class Account(CoreModel):
     last_update = models.DateTimeField()
     expiry_date = models.DateTimeField(null=True, blank=True)
     currency = models.ForeignKey(Attributes, limit_choices_to={'type':'currency'}, related_name='account_currency_rel')
+    country = models.ForeignKey(Attributes, limit_choices_to={'type':'country_iso2'}, related_name='account_country_rel')
     active = models.BooleanField()
 
     def get_fields(self):
