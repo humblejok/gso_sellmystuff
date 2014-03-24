@@ -1,14 +1,6 @@
-{% load socialaccount %}
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<title>Sell my stuff - My account</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<link href="/static/css/gammasimos.css" rel="stylesheet" type="text/css"/>
-		<link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-		<link href="/static/jquery.gridster.css" rel="stylesheet" type="text/css">
-		<script src="/static/jquery-2.0.2.min.js" type="text/javascript"></script>
-		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+{% extends "sms_base.html" %}
+{% block title %}Sell my stuff - My account{% endblock %}
+{% block headeroptions %}
 		<script src="/static/jquery.gridster.js"></script>
 		<script>
 			$(document).ready(function () {
@@ -24,16 +16,8 @@
 			});
 
 		</script>
-	</head>
-	<body>
-		<div class="container" style="padding: 0 15px;">
-			{% if request.user.is_authenticated %}
-				<div class="row">
-					<a href="/account_view.html" class="btn btn-primary btn-sm" role="button">View</a>
-					<a href="/account_edition.html" class="btn btn-primary btn-sm" role="button">Edit</a>
-					<a href="/account_management.html" class="btn btn-primary btn-sm" role="button">Manage</a>
-					<a href="/accounts/logout" class="btn btn-primary btn-sm" role="button">Log out</a>
-				</div>
+{% endblock %}
+{% block content %}
 				<div class="row">
 					<div class="col-lg-3">
 						<h3>Your ads</h3>
@@ -58,10 +42,4 @@
 						</div>
 					</div>
 				</div>
-			{% else %}
-				<div class="row">
-					<a href="/accounts/login" class="btn btn-primary btn-lg" role="button">Login</a>
-				</div>
-			{% endif %}
-		</div>
-	</body>
+{% endblock %}

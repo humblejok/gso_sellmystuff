@@ -1,0 +1,50 @@
+<div class='modal fade' id='modal_edit_{{current.id}}' tabindex='-1' role='dialog' aria-labelledby='modal_edit_label_{{current.id}}' aria-hidden='true'>
+	<div class='modal-dialog modal-lg'>
+		<div class='modal-content'>
+			<div class='modal-header'>
+				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
+				<h4 class='modal-title' id='modal_edit_label_{{current.id}}'>Edit &quot;{{current.title}}&quot;</h4>
+			</div>
+			<div class='modal-body'>
+				<form id='edit_form_{{current.id}}' class='form-horizontal' role='form' action='/edit_base_information_universe' method='POST'>{% csrf_token %}
+					<div class='form-group'>
+						<label for='title' class='col-lg-1 control-label'>Title</label>
+						<div class='col-lg-11'>
+							<input type='text' class='form-control' id='title' name='title' placeholder='Your ad title' value='{{current.title}}'/>
+						</div>
+					</div>
+					<div class='form-group'>
+						<label for='subtitle' class='col-lg-1 control-label'>Subtitle</label>
+						<div class='col-lg-11'>
+							<input type='text' class='form-control' id='subtitle' name='subtitle' placeholder='Your ad subtitle' value='{{current.subtitle}}'/>
+						</div>
+					</div>
+					<div class='form-group'>
+						<label for='type' class='col-lg-1 control-label'>Type</label>
+						<div class='col-lg-4'>
+							<select class='form-control' id='type' name='type'>
+								{% with value=current.type.identifier %}
+									{% include 'statics/ad_type_en.html' %}
+								{% endwith %}
+							</select>
+						</div>
+						<label for='category' class='col-lg-offset-2 col-lg-1 control-label'>Category</label>
+						<div class='col-lg-4'>
+							<select class='form-control' id='category' name='category'>
+								{% with value=current.category.identifier %}
+									{% include 'statics/ad_cat_type_en.html' %}
+								{% endwith %}
+							</select>
+						</div>
+					</div>
+					<div class='form-group'>
+						<label for='type' class='col-lg-1 control-label'>Type</label>
+					</div>
+				</form>
+			</div>
+			<div class='modal-footer'>
+				<button type='submit' class='btn btn-success' role='button' data-toggle='tooltip' data-placement='bottom' title='Confirm your modification and save your advertisement' onclick='edit_form_{{current.id}}.submit()'>Done</a>
+			</div>
+		</div>
+	</div>
+</div>

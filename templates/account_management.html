@@ -1,0 +1,45 @@
+{% extends "sms_base.html" %}
+{% block title %}Sell my stuff - Manage{% endblock %}
+{% block headeroptions %}
+		<script src="/static/jquery.gridster.js"></script>
+		<script>
+			$(document).ready(function () {
+		     	$(".btn").tooltip();
+				gridster = $(".gridster ul").gridster({
+					widget_base_dimensions: [90, 90],
+					widget_margins: [5, 5],
+					autogrow_cols: true,
+					resize: {
+						enabled: true
+					}
+				}).data('gridster');
+			});
+
+		</script>
+{% endblock %}
+{% block content %}
+				<div class="row">
+					<div class="col-lg-3">
+						<h3>Your ads</h3>
+						<ul class="list-group">
+						{% for ad in all_ads %}
+						  <li class="list-group-item">
+						    <span class="badge">{{ ad.views }}</span>
+						    {{ ad.title }}
+						  </li>
+						{% endfor %}
+						</ul>
+					</div>
+					<div class="col-lg-9">
+						<h3>Your view</h3>
+						<div class="gridster">
+							<ul>
+								<li data-row="1" data-col="1" data-sizex="4" data-sizey="4">0</li>
+								<li data-row="1" data-col="2" data-sizex="4" data-sizey="4">1</li>
+								<li data-row="2" data-col="1" data-sizex="4" data-sizey="4">2</li>
+								<li data-row="2" data-col="2" data-sizex="4" data-sizey="4">3</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+{% endblock %}

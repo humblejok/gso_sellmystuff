@@ -4,14 +4,29 @@ from django.contrib.auth.models import User
 import os
 from seq_common.utils import classes
 from openpyxl.reader.excel import load_workbook
+from django.template import loader
+from django.template.context import Context
 
 MAIN_PATH = 'c:\\DEV\\Sources\\gso_sellmystuff\\resources'
+STATICS_PATH = 'c:\\DEV\\Sources\\gso_sellmystuff\\templates\\statics'
 
 LOGGER = logging.getLogger(__name__)
 
 def setup():
     populate_attributes_from_xlsx('sellmystuff.models.Attributes', os.path.join(MAIN_PATH,'Repository Setup.xlsx'))
+    generate_attributes()
     # populate_attributes_from_xlsx('universe.models.Dictionary', os.path.join(MAIN_PATH,'Repository Setup.xlsx'))
+
+def generate_attributes():
+    all_types = Attributes.objects.all().order_by('type').distinct('type')
+    for a_type in all_types:
+        all_elements = Attributes.objects.filter(type=a_type.type, active=True)
+        context = Context({"selection": all_elements})
+        template = loader.get_template('helper/attributes_option_renderer.html')
+        rendition = template.render(context)
+        outfile = os.path.join(STATICS_PATH, a_type.type + '_en.html')
+        with open(outfile,'w') as o:
+            o.write(rendition.encode('utf-8'))
 
 def populate_attributes_from_xlsx(model_name, xlsx_file):
     model = classes.my_class_import(model_name)
@@ -174,16 +189,17 @@ class Media(CoreModel):
 class Advertisement(CoreModel):
     title = models.CharField(max_length=256)
     sub_title = models.CharField(max_length=128, null=True, blank=True)
-    publish_date = models.DateTimeField()
+    publish_date = models.DateTimeField(null=True, blank=True)
     last_update = models.DateTimeField()
     type = models.ForeignKey(Attributes, limit_choices_to={'type':'ad_type'}, related_name='ad_type_rel')
     category = models.ForeignKey(Attributes, limit_choices_to={'type':'ad_cat_type'}, related_name='ad_cat_type_rel')
     medias = models.ManyToManyField("Media", related_name='ad_media_rel', null=True)
     comments = models.ManyToManyField("Comment", related_name='ad_comment_rel', null=True)
     price = models.FloatField(null=True, blank=True)
+    views = models.IntegerField(default=0)
     
     sold = models.BooleanField()
-    buyer = models.ForeignKey(Account, related_name='ad_buyer_rel')
+    buyer = models.ForeignKey(Account, related_name='ad_buyer_rel', null=True)
     active = models.BooleanField()
     owner = models.ForeignKey(Account, related_name='ad_owner_rel')
     

@@ -1,0 +1,76 @@
+{% extends "sms_base.html" %}
+{% block title %}Sell my stuff - Edit{% endblock %}
+{% block headeroptions %}
+		<script src="/static/jquery.gridster.js"></script>
+		<script>
+			$(document).ready(function () {
+		     	$(".btn").tooltip();
+				gridster = $(".gridster ul").gridster({
+					widget_base_dimensions: [90, 90],
+					widget_margins: [5, 5],
+					autogrow_cols: true,
+					resize: {
+						enabled: true
+					}
+				}).data('gridster');
+			});
+			var data = {"ads":[], "template":""}
+			var creation = null;
+
+			function creationDone() {
+				if (creation.responseJSON.result==true) {
+					var modals = document.getElementById('allModals');
+					modals.innerHTML = modals.innerHTML + creation.responseJSON.rendition;
+					editAdvertisement(creation.responseJSON.ad_id);
+
+				} else {
+					// TODO: Handle message
+				}
+			}
+
+			function editAdvertisement(ad_id) {
+				$('#modal_edit_' + ad_id).modal({show:true})
+			}
+
+			function createFailed() {
+				alert("failed");
+			}
+
+			function createAdvertisement() {
+				creation = $.ajax("/advertisement_creation.html").done(creationDone).fail(createFailed);
+			}
+		</script>
+{% endblock %}
+{% block content %}
+				<div class="row">
+					<div class="col-lg-3">
+						<h3>Your ads
+						<button type="button" class="btn btn-default btn-sm" onclick="createAdvertisement()">
+							<span class="glyphicon glyphicon-plus"></span> Add
+						</button>
+						</h3>
+						<ul class="list-group">
+						{% for ad in all_ads %}
+						  <li class="list-group-item">
+						    <span class="badge">{{ ad.views }}</span>
+						    {{ ad.title }}
+						    <button role="button" class="btn btn-sm" onclick="editAdvertisement({{ad.id}})" />
+						  </li>
+						{% endfor %}
+						</ul>
+					</div>
+					<div class="col-lg-9">
+						<h3>Your view</h3>
+						<div class="gridster">
+							<ul>
+
+							</ul>
+						</div>
+					</div>
+				</div>
+	<div id="allModals">
+		{% for ad in all_ads %}
+			{% include "advertisement/advertisement_edition.html" with current=ad %}
+		{% endfor %}
+	</div>
+{% endblock %}
