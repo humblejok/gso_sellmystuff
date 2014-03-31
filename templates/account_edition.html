@@ -3,19 +3,91 @@
 {% block headeroptions %}
 		<script src="/static/jquery.gridster.js"></script>
 		<script>
-			$(document).ready(function () {
-		     	$(".btn").tooltip();
-				gridster = $(".gridster ul").gridster({
-					widget_base_dimensions: [90, 90],
-					widget_margins: [5, 5],
-					autogrow_cols: true,
-					resize: {
-						enabled: true
-					}
-				}).data('gridster');
-			});
 			var data = {"ads":[], "template":""}
 			var creation = null;
+			var allFiles = [];
+			var csrftoken;
+
+			function progressHandler(e) {
+				var percent = e.loaded / e.total;
+			};
+
+			function uploadDone(e) {
+				var columns = $("#filesTable_" + e.ad_id).find('.file_name');
+				for (var i = 0;i<columns.length;i++) {
+					if (columns[i].textContent==e.media_name) {
+						$("#filesTable_" + e.ad_id).find('.progress')[i].setAttribute("class","progress");
+					}
+				}
+			}
+
+			function appendRow(t_id, f) {
+				var tableContent = document.getElementById("files_" + t_id);
+  				var tr = document.getElementById("files_" + t_id).insertRow(-1);
+  				var nameCol = tr.insertCell(-1);
+  				var sizeCol = tr.insertCell(-1);
+  				var typeCol = tr.insertCell(-1);
+  				var progressCol = tr.insertCell(-1);
+  				var newText  = document.createTextNode(f.name);
+  				nameCol.setAttribute("class","file_name");
+  				nameCol.appendChild(newText);
+  				newText  = document.createTextNode("Image");
+  				typeCol.appendChild(newText);
+  				newText  = document.createTextNode((Math.round(f.size * 100 / 1024 / 1024) / 100) + "MB");
+  				sizeCol.appendChild(newText);
+  				progress = document.createElement("div")
+  				progress.setAttribute("class","progress progress-striped active");
+  				progressBar = document.createElement("div")
+  				progressBar.setAttribute("id","progress_" + tableContent.rows.length);
+  				progressBar.setAttribute("class","progress-bar");
+  				progressBar.setAttribute("role","progressbar");
+  				progressBar.setAttribute("aria-valuenow","10");
+  				progressBar.setAttribute("aria-valuemin","0");
+  				progressBar.setAttribute("aria-valuemax","100");
+  				progressBar.setAttribute("style","width: 100%;");
+  				progress.appendChild(progressBar);
+				progressCol.appendChild(progress);
+			}
+
+			function sendFiles() {
+				for (var i=0;i<allFiles.length;i++) {
+					var tempForm = new FormData();
+    				tempForm.append('uploaded_file', allFiles[i][0]);
+    				tempForm.append('ad_id', allFiles[i][1]);
+    				$.ajax({
+				        url: '/file_upload.html',
+				        xhr : function() {
+					        effectiveXHR = jQuery.ajaxSettings.xhr();
+					        effectiveXHR.upload.addEventListener('progress', progressHandler, false);
+					        return effectiveXHR;
+				        },
+				        type: 'POST',
+				        data: tempForm,
+				        processData: false,
+				        contentType: false,
+				        success: uploadDone,
+				    });
+				}
+				allFiles = [];
+			};
+
+			function handleDrop(e) {
+  				if (e.preventDefault) e.preventDefault();
+  				ad_id = e.target.id.substr(e.target.id.indexOf('_') + 1);
+  				for (var i=0;i<e.originalEvent.dataTransfer.files.length;i++) {
+  					if (e.originalEvent.dataTransfer.files[i].name.toLowerCase().endsWith('.jpg') || e.originalEvent.dataTransfer.files[i].name.toLowerCase().endsWith('.jpeg') || e.originalEvent.dataTransfer.files[i].name.toLowerCase().endsWith('.png') || e.originalEvent.dataTransfer.files[i].name.toLowerCase().endsWith('.gif')) {
+  						allFiles.push([e.originalEvent.dataTransfer.files[i], ad_id]);
+  						appendRow(ad_id,e.originalEvent.dataTransfer.files[i]);
+  					}
+  				}
+  				sendFiles();
+  			}
+
+			function cancel(e) {
+  				if (e.preventDefault) e.preventDefault(); // required by FF + Safari
+  				e.originalEvent.dataTransfer.dropEffect = 'copy'; // tells the browser what drop effect is allowed here
+  				return false; // required by IE
+			}
 
 			function creationDone() {
 				if (creation.responseJSON.result==true) {
@@ -39,6 +111,28 @@
 			function createAdvertisement() {
 				creation = $.ajax("/advertisement_creation.html").done(creationDone).fail(createFailed);
 			}
+
+			$(document).ready(function () {
+				csrftoken = getCookie('csrftoken');
+				String.prototype.endsWith = function(suffix) {
+					return this.indexOf(suffix, this.length - suffix.length) !== -1;
+				};
+		     	$(".btn").tooltip();
+				gridster = $(".gridster ul").gridster({
+					widget_base_dimensions: [90, 90],
+					widget_margins: [5, 5],
+					autogrow_cols: true,
+					resize: {
+						enabled: true
+					}
+				}).data('gridster');
+				$('.editor').wysiwyg();
+
+				$('.dropzone').on('dragover', cancel);
+				$('.dropzone').on('dragenter', cancel);
+				$('.dropzone').on('drop', handleDrop);
+			});
+
 		</script>
 {% endblock %}
 {% block content %}

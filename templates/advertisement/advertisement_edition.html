@@ -8,28 +8,28 @@
 			<div class='modal-body'>
 				<form id='edit_form_{{current.id}}' class='form-horizontal' role='form' action='/edit_base_information_universe' method='POST'>{% csrf_token %}
 					<div class='form-group'>
-						<label for='title' class='col-lg-1 control-label'>Title</label>
-						<div class='col-lg-11'>
+						<label for='title' class='col-lg-2 control-label'>Title</label>
+						<div class='col-lg-9'>
 							<input type='text' class='form-control' id='title' name='title' placeholder='Your ad title' value='{{current.title}}'/>
 						</div>
 					</div>
 					<div class='form-group'>
-						<label for='subtitle' class='col-lg-1 control-label'>Subtitle</label>
-						<div class='col-lg-11'>
+						<label for='subtitle' class='col-lg-2 control-label'>Subtitle</label>
+						<div class='col-lg-9'>
 							<input type='text' class='form-control' id='subtitle' name='subtitle' placeholder='Your ad subtitle' value='{{current.subtitle}}'/>
 						</div>
 					</div>
 					<div class='form-group'>
-						<label for='type' class='col-lg-1 control-label'>Type</label>
-						<div class='col-lg-4'>
+						<label for='type' class='col-lg-2 control-label'>Type</label>
+						<div class='col-lg-3'>
 							<select class='form-control' id='type' name='type'>
 								{% with value=current.type.identifier %}
 									{% include 'statics/ad_type_en.html' %}
 								{% endwith %}
 							</select>
 						</div>
-						<label for='category' class='col-lg-offset-2 col-lg-1 control-label'>Category</label>
-						<div class='col-lg-4'>
+						<label for='category' class='col-lg-offset-1 col-lg-2 control-label'>Category</label>
+						<div class='col-lg-3'>
 							<select class='form-control' id='category' name='category'>
 								{% with value=current.category.identifier %}
 									{% include 'statics/ad_cat_type_en.html' %}
@@ -38,7 +38,69 @@
 						</div>
 					</div>
 					<div class='form-group'>
-						<label for='type' class='col-lg-1 control-label'>Type</label>
+						<label for='description' class='col-lg-2 control-label'>Description</label>
+						<div class='col-lg-9'>
+							<div class='btn-toolbar' data-role='editor-toolbar' data-target='#description_{{current.id}}'>
+								<div class='btn-group'>
+									<a class='btn btn-default dropdown-toggle' data-toggle='dropdown' title='Font Size'><i class='fa fa-text-height'></i>&nbsp;<span class='caret'></span></a>
+									<ul class='dropdown-menu'>
+										<li><a data-edit='fontSize 5'><font size='5'>Huge</font></a></li>
+										<li><a data-edit='fontSize 3'><font size='3'>Normal</font></a></li>
+										<li><a data-edit='fontSize 1'><font size='1'>Small</font></a></li>
+									</ul>
+								</div>
+								<div class='btn-group'>
+									<a class='btn btn-default' data-edit='bold' title='Bold (Ctrl/Cmd+B)'><i class='fa fa-bold'></i></a>
+									<a class='btn btn-default' data-edit='italic' title='Italic (Ctrl/Cmd+I)'><i class='fa fa-italic'></i></a>
+									<a class='btn btn-default' data-edit='underline' title='Underline (Ctrl/Cmd+U)'><i class='fa fa-underline'></i></a>
+								</div>
+								<div class='btn-group'>
+									<a class='btn btn-default' data-edit='insertunorderedlist' title='Bullet list'><i class='fa fa-list-ul'></i></a>
+									<a class='btn btn-default' data-edit='insertorderedlist' title='Number list'><i class='fa fa-list-ol'></i></a>
+									<a class='btn btn-default' data-edit='outdent' title='Reduce indent (Shift+Tab)'><i class='fa fa-dedent'></i></a>
+									<a class='btn btn-default' data-edit='indent' title='Indent (Tab)'><i class='fa fa-indent'></i></a>
+								</div>
+								<div class='btn-group'>
+									<a class='btn btn-default' data-edit='justifyleft' title='Align Left (Ctrl/Cmd+L)'><i class='fa fa-align-left'></i></a>
+									<a class='btn btn-default' data-edit='justifycenter' title='Center (Ctrl/Cmd+E)'><i class='fa fa-align-center'></i></a>
+									<a class='btn btn-default' data-edit='justifyright' title='Align Right (Ctrl/Cmd+R)'><i class='fa fa-align-right'></i></a>
+									<a class='btn btn-default' data-edit='justifyfull' title='Justify (Ctrl/Cmd+J)'><i class='fa fa-align-justify'></i></a>
+								</div>
+								<div class='btn-group'>
+									<a class='btn btn-default dropdown-toggle' data-toggle='dropdown' title='Hyperlink'><i class='fa fa-link'></i></a>
+									<div class='dropdown-menu input-append'>
+										<input class='span2' placeholder='URL' type='text' data-edit='createLink'/>
+										<button class='btn btn-default' type='button'>Add</button>
+									</div>
+									<a class='btn btn-default' data-edit='undo' title='Undo (Ctrl/Cmd+Z)'><i class='fa fa-undo'></i></a>
+									<a class='btn btn-default' data-edit='redo' title='Redo (Ctrl/Cmd+Y)'><i class='fa fa-repeat'></i></a>
+								</div>
+							</div>
+
+							<div id='description_{{current.id}}' name='description' class='editor'>Test...
+							</div>
+						</div>
+					</div>
+					<div class='form-group'>
+						<div class='col-lg-4'>
+							<section id='drop_{{current.id}}' class='dropzone'>
+								<p class='info'>Drop here</p>
+							</section>
+						</div>
+						<div class='col-lg-8'>
+							<table class='table table-striped' id='filesTable_{{current.id}}'>
+								<thead class=''>
+									<tr>
+						       	    	<th width='50%'>Name</th>
+							            <th width='15%'>Size</th>
+							            <th width='15%'>Type</th>
+							            <th width='20%'>Upload</th>
+							        </tr>
+								</thead>
+								<tbody id='files_{{current.id}}'>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</form>
 			</div>

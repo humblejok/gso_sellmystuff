@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     url(r'^account_edition.html$', 'sellmystuff.views.account_edition', name='account_edition.html'),
     url(r'^account_management.html$', 'sellmystuff.views.account_management', name='account_management.html'),
     url(r'^advertisement_creation.html$', 'sellmystuff.views.advertisement_creation', name='advertisement_creation.html'),
+    url(r'^file_upload.html$', 'sellmystuff.views.file_upload', name='file_upload.html'),
+    
     
     # url(r'^gso_sellmystuff/', include('gso_sellmystuff.foo.urls')),
 

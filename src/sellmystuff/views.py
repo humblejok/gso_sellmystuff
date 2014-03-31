@@ -1,9 +1,12 @@
 from django.shortcuts import render, redirect
-from sellmystuff.models import Account, Advertisement, Attributes
+from sellmystuff.models import Account, Advertisement, Attributes, Media
 from datetime import datetime
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
-import simplejson
+from gso_sellmystuff.settings import MEDIA_ROOT
+
+import os
+from PIL import Image
 
 def index(request):
     account = None
@@ -24,10 +27,40 @@ def index(request):
             account.title = request.user.username
             account.type = Attributes.objects.get(identifier='ACCOUNT_TYPE_COMMON')
             account.save()
+            os.mkdir(os.path.join(MEDIA_ROOT,str(account.id)))
             redirect('/account_edition.html')
     context = {'account': account}
     return render(request, 'index.html', context)
-    
+
+def file_upload(request):
+    if request.user.is_authenticated and request.user.id!=None:
+        account = Account.objects.get(owner__id=request.user.id)
+        uploaded = Media()
+        uploaded.active = False
+        uploaded.description = request.FILES['uploaded_file'].name
+        uploaded.last_update = datetime.today()
+        uploaded.title = request.FILES['uploaded_file'].name
+        uploaded.identifier = 'MEDIA_'
+        uploaded.type = Attributes.objects.get(identifier='MEDIA_TYPE_IMAGE')
+        uploaded.owner = account
+        uploaded.save()
+        extension = os.path.splitext(request.FILES['uploaded_file'].name.lower())
+        extension = extension[1]
+        media_path = os.path.join(MEDIA_ROOT,str(account.id))
+        media_name = os.path.join(media_path,str(uploaded.id) + extension)
+        with open(media_name, 'wb+') as destination:
+            for chunk in request.FILES['uploaded_file'].chunks():
+                destination.write(chunk)
+        size = 64, 64
+        image = Image.open(os.path.join(media_path,str(uploaded.id) + extension))
+        image.thumbnail(size)
+        image.save(os.path.join(media_path,'t_' + str(uploaded.id) + extension))
+        ad_id = int(request.POST['ad_id'])
+        advertisement = Advertisement.objects.get(id=ad_id)
+        advertisement.medias.add(uploaded)
+        advertisement.save()
+    return HttpResponse('{"result": "OK", "media_name":"' + request.FILES['uploaded_file'].name + '", "media_id":' + str(uploaded.id) + ', "ad_id":' + str(ad_id) + '}',"json")
+
 def account_edition(request):
     # TODO: Handle bad access
     account = Account.objects.get(owner__id=request.user.id)
